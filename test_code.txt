@@ -1,3 +1,6 @@
 Hello world!
 git init
 git add .
+git commit -am "initialization"
+git remote add origin https://github.com/basushrabana16/Clustering-Algorithms.git
+git push origin master
