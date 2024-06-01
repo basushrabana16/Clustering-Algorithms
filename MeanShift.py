@@ -1,3 +1,5 @@
+#https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MeanShift.html
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt

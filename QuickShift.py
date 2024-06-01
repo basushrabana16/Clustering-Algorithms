@@ -1,8 +1,98 @@
+#https://www.vlfeat.org/api/quickshift.html
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.segmentation import quickshift
 from skimage.color import rgb2lab
+
+
+import cv2
+import numpy as np
+
+def gaussian_kernel(distances, sigma):
+    return np.exp(-0.5 * (distances / sigma) ** 2) / (sigma * np.sqrt(2 * np.pi))
+
+def parzen_density_estimate(data, sigma, distance_threshold=10):
+    n_points = data.shape[0]
+    density = np.zeros(n_points)
+    for i in range(n_points):
+        for j in range(i + 1, n_points):
+            dist = np.linalg.norm(data[i] - data[j])
+            if dist < distance_threshold:
+                density[i] += np.exp(-0.5 * (dist / sigma) ** 2) / (sigma * np.sqrt(2 * np.pi))
+                density[j] += np.exp(-0.5 * (dist / sigma) ** 2) / (sigma * np.sqrt(2 * np.pi))
+    return density
+
+
+def quick_shift(image, sigma=1.0):
+    # Convert image to suitable format for clustering
+    data = image.reshape((-1, 3)).astype(np.float32)
+    
+    # Perform Quick Shift clustering
+    parent, _, _ = quick_shift_core(data, sigma)
+    clusters = assign_clusters(parent)
+    
+    # Reshape cluster labels to match the image shape
+    segmented_image = clusters.reshape(image.shape[:2])
+    
+    return segmented_image
+
+def quick_shift_core(data, sigma):
+    # Calculate density estimates
+    density = parzen_density_estimate(data, sigma)
+    
+    # Initialize parent and distance arrays
+    parent = np.full(data.shape[0], -1, dtype=int)
+    min_distance = np.full(data.shape[0], np.inf)
+    
+    # Iterate over each point to find the parent
+    for i in range(data.shape[0]):
+        higher_density_indices = np.where(density > density[i])[0]
+        if len(higher_density_indices) > 0:
+            distances = np.sum((data[higher_density_indices] - data[i])**2, axis=1)
+            min_idx = np.argmin(distances)
+            parent[i] = higher_density_indices[min_idx]
+            min_distance[i] = distances[min_idx]
+    
+    return parent, min_distance, density
+
+def assign_clusters(parent):
+    # Assign cluster labels based on tree structure
+    clusters = np.full(len(parent), -1, dtype=int)
+    cluster_id = 0
+    
+    for i in range(len(parent)):
+        if clusters[i] == -1:  # If not yet assigned to a cluster
+            current = i
+            while parent[current] != -1 and clusters[current] == -1:
+                clusters[current] = cluster_id
+                current = parent[current]
+            cluster_id += 1
+    
+    return clusters
+
+# Read the image
+image = cv2.imread("images/milkshake.jpg")
+
+# Apply Quick Shift segmentation
+segmented_image = quick_shift(image)
+
+# Save the segmented image
+cv2.imwrite("segmented_image_quickshift2.jpg", segmented_image)
+
+
+
+
+
+'''
+
+
+
+
+
+
+
 
 def load_image(image_path):
     """
@@ -87,4 +177,4 @@ def main(image_path, output_path, kernel_size=3, max_dist=6, ratio=0.5):
 if __name__ == "__main__":
     image_path = 'images/milkshake.jpg'
     output_path = 'segmented_image_quickshift.jpg'
-    main(image_path, output_path)
+    main(image_path, output_path)'''

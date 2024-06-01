@@ -2,23 +2,23 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Step 1: Load the Image
-image = cv2.imread('milkshake.jpg')
+# Step 1: Loading the Image
+image = cv2.imread('images/milkshake.jpg')
 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert to RGB
 
 # Step 2: Preprocess the Image
-# Convert the image to a 2D array of pixels
+# Converting the image to a 2D array of pixels
 pixels = image.reshape((-1, 3))
 pixels = np.float32(pixels)
 
-# Step 3: Choose a Segmentation Method
-# Define criteria, number of clusters (K) and apply K-means
+# Step 3: Choosing K-means asalgorithm a Segmentation Method
+# Defining criteria, number of clusters (K) and apply K-means
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
 K = 4  # Number of clusters
 _, labels, centers = cv2.kmeans(pixels, K, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
-# Step 4: Apply the Segmentation Method
-# Convert back the centers to 8 bit values
+# Step 4: Applying the Segmentation Method
+# Converting back the centers to 8 bit values
 centers = np.uint8(centers)
 segmented_image = centers[labels.flatten()]
 
