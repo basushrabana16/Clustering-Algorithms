@@ -14,7 +14,7 @@ pixels = np.float32(pixels)
 # Step 3: Choosing K-means asalgorithm a Segmentation Method
 # Defining criteria, number of clusters (K) and apply K-means
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
-K = 4  # Number of clusters
+K = 4
 _, labels, centers = cv2.kmeans(pixels, K, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
 # Step 4: Applying the Segmentation Method
@@ -25,11 +25,8 @@ segmented_image = centers[labels.flatten()]
 # Reshape the image to the original image's shape
 segmented_image = segmented_image.reshape(image.shape)
 
-# Step 5: Post-process the Segmented Image (Optional)
-# This step can include refining the segmentation, smoothing, etc.
-
 # Step 6: Visualize and Save the Segmented Image
-# Display the original and segmented images
+# original and segmented images
 plt.figure(figsize=(10, 5))
 
 plt.subplot(1, 2, 1)
@@ -44,6 +41,6 @@ plt.axis('off')
 
 plt.show()
 
-# Save the segmented image
+
 segmented_image_bgr = cv2.cvtColor(segmented_image, cv2.COLOR_RGB2BGR)  # Convert back to BGR for saving
 cv2.imwrite('segmented_image.jpg', segmented_image_bgr)

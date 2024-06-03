@@ -5,8 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage.segmentation import quickshift
 from skimage.color import rgb2lab
-
-
 import cv2
 import numpy as np
 
